@@ -1,0 +1,17 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const app = express();
+app.use(cors());
+app.use(express.json());
+const PORT = process.env.PORT || 10000;
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://11223344chethu_db_user:4v5zPSV13TPVm1t7@cluster0.jladsxf.mongodb.net/kitchen_db?appName=Cluster0";
+mongoose.connect(MONGO_URI).then(()=>console.log("Mongo Connected"));
+const Order = mongoose.model("Order", new mongoose.Schema({ tableNo:String, items:Array, status:String, total:Number, createdAt:{type:Date,default:Date.now} }));
+const Menu = mongoose.model("Menu", new mongoose.Schema({ name:String, price:Number, category:String }));
+app.get("/", (req,res)=>res.json({message:"Kitchen Backend Running"}));
+app.get("/api/menu", async(req,res)=>res.json(await Menu.find()));
+app.post("/api/menu", async(req,res)=>{ const i=new Menu(req.body); await i.save(); res.json(i); });
+app.get("/api/orders", async(req,res)=>res.json(await Order.find()));
+app.post("/api/orders", async(req,res)=>{ const o=new Order(req.body); await o.save(); res.json(o); });
+app.listen(PORT, ()=>console.log("Running"));
